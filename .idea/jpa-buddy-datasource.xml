@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JpbDataSourceConfig">
+    <data-source-infos>
+      <data-source-info id="f42696b1-01d0-4b81-808f-556eafbc6b29" persistence-unit-name="asconi-backend:asconi-backend" />
+    </data-source-infos>
+  </component>
+</project>

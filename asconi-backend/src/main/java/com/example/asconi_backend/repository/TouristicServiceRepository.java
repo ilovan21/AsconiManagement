@@ -1,0 +1,25 @@
+package com.example.asconi_backend.repository;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import com.example.asconi_backend.model.TouristicService;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+@Repository
+public interface TouristicServiceRepository extends JpaRepository<TouristicService, Integer> {
+    List<TouristicService> findByName(String name);
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO service_reserve (service_id, data, heure,nr_personnes) " +
+            "VALUES (:serviceId, :date, :hour, :nrPeople)", nativeQuery = true)
+    void addServiceIndisponibility(@Param("serviceId") Integer serviceId,
+                            @Param("date") LocalDate date,
+                            @Param("houre") LocalTime hour,
+                            @Param("nrPeople") Integer nrPeople);
+    }
