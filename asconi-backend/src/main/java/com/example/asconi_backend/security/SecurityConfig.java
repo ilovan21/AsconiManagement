@@ -52,11 +52,10 @@ public class SecurityConfig {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/public/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("/api/hostess/**").hasAuthority("HOSTESS")
-                        .requestMatchers("/api/personnel/**").hasAuthority("PERSONNEL")
-                );
+                        .requestMatchers("/api/auth/**", "/api/restaurant/public/**","/api/service/public/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN") // Enum convertit la string
+                        .requestMatchers("/api/restaurant/manage/**","/api/service/manage/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HOSTESS")
+                        .requestMatchers("/api/service/view/**", "/api/restaurant/view/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HOSTESS", "ROLE_PERSONNEL") );
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

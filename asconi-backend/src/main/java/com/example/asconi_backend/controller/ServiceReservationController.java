@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/public/service")
+@RequestMapping("/api/service")
 public class ServiceReservationController {
 
     private final TouristicServiceRepository touristicServiceRepository;
@@ -36,7 +36,7 @@ public class ServiceReservationController {
         this.reservationService = reservationService;
         this.serviceReservationService = serviceReservationService;
     }
-    @GetMapping("/check-availability")
+    @GetMapping("/public/check-availability")
     public ResponseEntity<AvailabilityServiceResponseDTO> checkAvailability(@RequestBody AvailabilityServiceRequestDTO request) {
         boolean isAvailable = reservationService.checkAvailability(
                 request.getServiceId(),
@@ -59,7 +59,7 @@ public class ServiceReservationController {
 
         return ResponseEntity.ok(response);
     }
-    @PostMapping("/reserve")
+    @PostMapping("/public/reserve")
     public ResponseEntity<?> reserveService(@RequestBody @Valid ServiceReservationDTO reservationDTO) {
         try {
             System.out.println("Received reservation request: " + reservationDTO);
@@ -88,11 +88,27 @@ public class ServiceReservationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while processing the reservation.");
         }
     }
-    @GetMapping("/by-date")
-    public List<ServiceReservation> getReservationsByDate(
-            @RequestParam(required = false) String date) {
-        LocalDate parsedDate = (date != null) ? LocalDate.parse(date) : null;
-        return serviceReservationService.getReservationsByDate(parsedDate);
-    }
+    @GetMapping("/view/filter")
+    public List<ServiceReservation> getReservationsByDateAndService(
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) Integer serviceId) {
+        LocalDate parsedDate = (date != null) ? LocalDate.parse(date) : LocalDate.now();
 
+        if ( serviceId == null) {
+            return serviceReservationService.getReservationsByDate(parsedDate);
+        }
+        return serviceReservationService.getReservationsByDateAndServiceId(parsedDate, serviceId);
+ }
+
+    @DeleteMapping("/manage/delete/{id}")
+    public ResponseEntity<String> deleteReservation(@PathVariable Integer id) {
+        try {
+            serviceReservationService.deleteReservation(id);
+            return ResponseEntity.ok("Reservation deleted successfully.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the reservation.");
+        }
+    }
 }

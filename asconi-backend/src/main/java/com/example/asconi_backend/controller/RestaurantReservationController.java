@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("api/public/restaurant")
+@RequestMapping("api/restaurant")
 public class RestaurantReservationController {
 
     private final RestaurantReservationService restaurantReservationService;
@@ -33,7 +33,7 @@ public class RestaurantReservationController {
         this.restaurantReservationService = restaurantReservationService;
     }
 
-    @GetMapping("/check-availability")
+    @GetMapping("/public/check-availability")
     public ResponseEntity<?> checkAvailability(@RequestBody AvailabilityRestaurantRequestDTO request) {
         Integer nrPeople = request.getNrPeople();
         Integer hallId = request.getHallId();
@@ -64,7 +64,7 @@ public class RestaurantReservationController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
     }
-    @PostMapping("reserve")
+    @PostMapping("public/reserve")
     public ResponseEntity<RestaurantReservation> createReservation(@RequestBody @Valid RestaurantReservation reservationRequest) {
         try {
             RestaurantReservation reservation = restaurantReservationService.reserveTable(
@@ -86,18 +86,31 @@ public class RestaurantReservationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
-    @GetMapping("/by-date")
+    @GetMapping("/view/by-date")
     public List<RestaurantReservation> getReservationsByDate(
             @RequestParam(required = false) String date) {
         LocalDate parsedDate = (date != null) ? LocalDate.parse(date) : null;
         return restaurantReservationService.getReservationsByDate(parsedDate);
     }
-    @GetMapping("/by-hall")
+    @GetMapping("/view/by-hall")
     public List<RestaurantReservation> getReservationsByHall(
             @RequestParam(required = false) Integer hallId) {
         return restaurantReservationService.getReservationsByHall(hallId);
     }
-    @DeleteMapping("/delete/{id}")
+    @GetMapping("/view/filter")
+    public List<RestaurantReservation> getReservationsByDateAndHall(
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) Integer hallId) {
+
+        LocalDate parsedDate = (date != null) ? LocalDate.parse(date) : LocalDate.now();
+
+        if ( hallId == null) {
+            return restaurantReservationService.getReservationsByDate(parsedDate);
+        }
+            return restaurantReservationService.getReservationsByDateAndHallId(parsedDate, hallId);
+    }
+
+    @DeleteMapping("/manage/delete/{id}")
     public ResponseEntity<String> deleteReservation(@PathVariable Integer id) {
         try {
             restaurantReservationService.deleteReservation(id);

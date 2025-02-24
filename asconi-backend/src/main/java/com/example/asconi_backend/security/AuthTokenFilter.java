@@ -29,16 +29,15 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        System.out.println("Cerere: " + path);
-        if (path.startsWith("/api/auth/") || path.startsWith("/api/public/")) {
+        if (path.startsWith("/api/auth/") || path.startsWith("/api/service/public/")|| path.startsWith("/api/restaurant/public/")) {
             filterChain.doFilter(request, response);
             return;
         }
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                String username = jwtUtils.getUsernameFromToken(jwt);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                String email = jwtUtils.getUsernameFromToken(jwt);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
@@ -48,8 +47,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (Exception e) {
-            System.out.println("Cannot set user authentication: " + e);
+        }catch (Exception e) {
+            e.printStackTrace(); // Printează stack trace-ul complet pentru debugging
         }
         filterChain.doFilter(request, response);
     }

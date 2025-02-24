@@ -51,10 +51,18 @@ public class ServiceReservationService {
         return serviceReservationRepository.save(serviceReservation);
     }
     public List<ServiceReservation> getReservationsByDate(LocalDate date) {
-        System.out.println("Filtrare rezervări pentru data: " + date);
-        if (date != null) {
             return reservationServiceRepository.findByDate(date);
-        }
-        return reservationServiceRepository.findAll();
+    }
+    public List<ServiceReservation> getReservationsByDateAndServiceId(LocalDate date, Integer serviceId){
+        return serviceReservationRepository.findByTouristicServiceIdAndDate(serviceId,date);
+    }
+    public void deleteReservation(Integer id) {
+        Optional<ServiceReservation> serviceReservation = serviceReservationRepository.findById(id);
+        touristicServiceRepository.deleteServiceIndisponibility(
+                serviceReservation.get().getTouristicService().getId(),
+                serviceReservation.get().getDate(),
+                serviceReservation.get().getHour(),
+                serviceReservation.get().getNrPeople());
+        reservationServiceRepository.deleteById(id);
     }
 }

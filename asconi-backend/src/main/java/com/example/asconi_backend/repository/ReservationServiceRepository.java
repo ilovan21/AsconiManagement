@@ -36,11 +36,11 @@ public interface ReservationServiceRepository extends JpaRepository<ServiceReser
             @Param("hour") LocalTime hour,
             @Param("nrPeople") Integer nrPeople
     );
-    @Query("SELECT r FROM ServiceReservation r WHERE r.date = :date")
-    List<ServiceReservation> findByDate(@Param("date") LocalDate date);
 
+    List<ServiceReservation> findByDate(LocalDate date);
     //filtrare rezervari dupa zile si ora
     List<ServiceReservation>findByDateAndHour(LocalDate date, LocalTime hour);
     List<ServiceReservation> findByTouristicServiceId(Integer serviceId);
+    List<ServiceReservation> findByTouristicServiceIdAndDate(Integer serviceId, LocalDate date);
 }
 

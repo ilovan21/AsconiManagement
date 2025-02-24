@@ -47,7 +47,6 @@ public class AuthController {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String jwt = jwtUtils.generateToken(userDetails);
-
         return jwt;
     }
     @PostMapping("/signup")
@@ -55,7 +54,7 @@ public class AuthController {
         if (userRepository.existsByEmail(user.getEmail())) {
             return "Error: Email already in use!";
         }
-        Role clientRole = roleRepository.findByName(RoleType.CLIENT)
+        Role clientRole = roleRepository.findByName(RoleType.HOSTESS)
                 .orElseThrow(() -> new RuntimeException("Error: Role CLIENT not found."));
 
         User newUser = new User(

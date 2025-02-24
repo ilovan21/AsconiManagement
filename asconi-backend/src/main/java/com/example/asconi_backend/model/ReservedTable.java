@@ -27,7 +27,7 @@ public class ReservedTable {
     private LocalDate date;
 
     @Column(name = "heure_arrive", nullable = false)
-    private LocalTime arrivalTime;
+    private LocalTime arrivingTime;
 
     @Column(name = "heure_parti", nullable = false)
     private LocalTime leavingTime;

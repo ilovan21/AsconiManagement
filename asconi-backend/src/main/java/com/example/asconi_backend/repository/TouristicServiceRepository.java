@@ -27,4 +27,15 @@ public interface TouristicServiceRepository extends JpaRepository<TouristicServi
                             @Param("date") LocalDate date,
                             @Param("hour") LocalTime hour,
                             @Param("nrPeople") Integer nrPeople);
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM service_reserve " +
+            "WHERE service_id = :serviceId " +
+            "AND date = :date " +
+            "AND heure = :hour " +
+            "AND nr_personnes = :nrPeople", nativeQuery = true)
+    void deleteServiceIndisponibility(@Param("serviceId") Integer service_id,
+                               @Param("date") LocalDate date,
+                               @Param("hour") LocalTime hour,
+                               @Param("nrPeople") Integer nrPeople);
     }

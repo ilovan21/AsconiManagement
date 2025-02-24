@@ -62,15 +62,12 @@ public class RestaurantReservationService {
         reservationRestaurantRepository.save(reservation);
     }
 
-    // Obținerea tuturor rezervărilor
+    public List<RestaurantReservation> getReservationsByDateAndHallId(LocalDate date,Integer hallId) {
+        return reservationRestaurantRepository.findByDateAndHallId(date,hallId);
+    }
     public List<RestaurantReservation> getAllReservations() {
         return reservationRestaurantRepository.findAll();
     }
-
-    // Obținerea unei rezervări după ID
-//    public RestaurantReservation getReservationById(Integer id) {
-//        return reservationRestaurantRepository.findById(id);
-//    }
 
     // Ștergerea unei rezervări
     public void deleteReservation(Integer id) {
@@ -80,10 +77,7 @@ public class RestaurantReservationService {
     }
     public List<RestaurantReservation> getReservationsByDate(LocalDate date) {
         System.out.println("Filtrare rezervări pentru data: " + date);
-        if (date != null) {
             return reservationRestaurantRepository.findByDate(date);
-        }
-        return reservationRestaurantRepository.findAll(); // Dacă nu se dă nicio dată, returnează toate rezervările
     }
     public List<RestaurantReservation> getReservationsByHall(Integer hallId) {
         System.out.println("Filtrare rezervări pentru sala: " + hallId);

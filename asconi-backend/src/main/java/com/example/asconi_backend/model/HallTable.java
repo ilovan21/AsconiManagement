@@ -21,8 +21,11 @@ public class HallTable {
     @JoinColumn(name = "salle_id", referencedColumnName = "id", insertable = false, updatable = false)
     private Hall hall;
 
-    @Column(name="capacite",nullable = false)
-    private Integer capacity;
+    @Column(name="capacite_min",nullable = false)
+    private Integer minCapacity;
+
+    @Column(name="capacite_max",nullable = false)
+    private Integer maxCapacity;
 
     @Column(name="statut",nullable = false, columnDefinition = "INT DEFAULT 0 CHECK (statut IN (0,1))")
     private Integer status = 0;
