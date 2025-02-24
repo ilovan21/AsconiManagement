@@ -18,7 +18,7 @@ public interface ReservationServiceRepository extends JpaRepository<ServiceReser
             SELECT service_id, SUM(nr_personnes) AS total_rezervat
             FROM service_reserve
             WHERE date = :date 
-            AND heure = :heure 
+            AND heure = :hour 
             GROUP BY service_id
         )
         SELECT st.id, st.nom, st.capacite, 
@@ -28,7 +28,7 @@ public interface ReservationServiceRepository extends JpaRepository<ServiceReser
         LEFT JOIN rezervari_existente re ON st.id = re.service_id
         WHERE st.id = :serviceId
         GROUP BY st.id, st.nom, st.capacite, re.total_rezervat
-        HAVING (st.capacite - COALESCE(re.total_rezervat, 0)) >= :nrPersonnes
+        HAVING (st.capacite - COALESCE(re.total_rezervat, 0)) >= :nrPeople
         """, nativeQuery = true)
     List<Object[]> findAvailableServices(
             @Param("serviceId") Integer serviceId,
@@ -36,5 +36,11 @@ public interface ReservationServiceRepository extends JpaRepository<ServiceReser
             @Param("hour") LocalTime hour,
             @Param("nrPeople") Integer nrPeople
     );
+    @Query("SELECT r FROM ServiceReservation r WHERE r.date = :date")
+    List<ServiceReservation> findByDate(@Param("date") LocalDate date);
+
+    //filtrare rezervari dupa zile si ora
+    List<ServiceReservation>findByDateAndHour(LocalDate date, LocalTime hour);
+    List<ServiceReservation> findByTouristicServiceId(Integer serviceId);
 }
 

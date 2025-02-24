@@ -1,4 +1,5 @@
 package com.example.asconi_backend.model;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,5 +21,6 @@ public class Restaurant {
     private String restaurantName;
 
     @OneToMany(mappedBy = "restaurant")
+    @JsonManagedReference
     private List<Hall> hall;
 }

@@ -1,4 +1,5 @@
 package com.example.asconi_backend.service;
+import com.example.asconi_backend.model.RestaurantReservation;
 import com.example.asconi_backend.model.ServiceReservation;
 import com.example.asconi_backend.model.TouristicService;
 import com.example.asconi_backend.repository.ReservationServiceRepository;
@@ -14,32 +15,31 @@ import java.util.Optional;
 
 @Service
 public class ServiceReservationService {
-    @Autowired
-    private ReservationServiceRepository serviceReservationRepository;
-    @Autowired
-    private TouristicServiceRepository touristicServiceRepository;
+    private final ReservationServiceRepository serviceReservationRepository;
+    private final TouristicServiceRepository touristicServiceRepository;
+    private final ReservationServiceRepository reservationServiceRepository;
 
+    @Autowired
+    public ServiceReservationService(ReservationServiceRepository serviceReservationRepository, TouristicServiceRepository touristicServiceRepository, ReservationServiceRepository reservationServiceRepository) {
+        this.serviceReservationRepository = serviceReservationRepository;
+        this.touristicServiceRepository = touristicServiceRepository;
+        this.reservationServiceRepository = reservationServiceRepository;
+    }
     // verificare disponiblitate serviciu
     public boolean checkAvailability(Integer serviceId, Integer nrPeople, LocalDate date, LocalTime hour) {
         List<Object[]> availableService = serviceReservationRepository.findAvailableServices(serviceId, date, hour, nrPeople);
         return !availableService.isEmpty();
     }
-
     public ServiceReservation reserveService(Integer serviceId, Integer nrPeople,
                                              String nameSurname, String email, String phone,
                                              LocalDate date, LocalTime hour, String language, String specifications) {
 
-        if(!checkAvailability(serviceId, nrPeople, date, hour)) {
-            throw new RuntimeException("Il n'y a pas de places disponibles");
-        }
-        Optional<TouristicService> serviceOpt = touristicServiceRepository.findById(serviceId);
-        TouristicService service = serviceOpt.get();
-
+        TouristicService touristicService = touristicServiceRepository.findById(serviceId)
+                .orElseThrow(() -> new RuntimeException("Service with ID " + serviceId + " not found"));
 
         touristicServiceRepository.addServiceIndisponibility(serviceId,date,hour,nrPeople);
-
         ServiceReservation serviceReservation = new ServiceReservation();
-        serviceReservation.setTouristicService(service);
+        serviceReservation.setTouristicService(touristicService);
         serviceReservation.setNrPeople(nrPeople);
         serviceReservation.setNameSurname(nameSurname);
         serviceReservation.setEmail(email);
@@ -49,5 +49,12 @@ public class ServiceReservationService {
         serviceReservation.setLanguage(language);
         serviceReservation.setSpecifications(specifications);
         return serviceReservationRepository.save(serviceReservation);
+    }
+    public List<ServiceReservation> getReservationsByDate(LocalDate date) {
+        System.out.println("Filtrare rezervări pentru data: " + date);
+        if (date != null) {
+            return reservationServiceRepository.findByDate(date);
+        }
+        return reservationServiceRepository.findAll();
     }
 }

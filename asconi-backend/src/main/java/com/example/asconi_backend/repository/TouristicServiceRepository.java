@@ -10,16 +10,21 @@ import com.example.asconi_backend.model.TouristicService;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TouristicServiceRepository extends JpaRepository<TouristicService, Integer> {
     List<TouristicService> findByName(String name);
+
+    @Override
+    Optional<TouristicService> findById(Integer id);
+
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO service_reserve (service_id, data, heure,nr_personnes) " +
+    @Query(value = "INSERT INTO service_reserve (service_id, date, heure,nr_personnes) " +
             "VALUES (:serviceId, :date, :hour, :nrPeople)", nativeQuery = true)
     void addServiceIndisponibility(@Param("serviceId") Integer serviceId,
                             @Param("date") LocalDate date,
-                            @Param("houre") LocalTime hour,
+                            @Param("hour") LocalTime hour,
                             @Param("nrPeople") Integer nrPeople);
     }

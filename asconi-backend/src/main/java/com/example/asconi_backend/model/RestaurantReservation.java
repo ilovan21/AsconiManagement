@@ -22,7 +22,7 @@ public class RestaurantReservation {
     private String nameSurname;
 
     @ManyToOne
-    @JoinColumn(name = "salle_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "salle_id", referencedColumnName = "id")
     private Hall hall;
 
     private String email;
@@ -32,7 +32,7 @@ public class RestaurantReservation {
     private LocalDate date;
 
     @Column(name = "heure_arrivee", nullable = false)
-    private LocalTime arrivalTime;
+    private LocalTime arrivingTime;
 
     @Column(name = "heure_partir", nullable = false)
     private LocalTime leavingTime;
@@ -42,4 +42,5 @@ public class RestaurantReservation {
 
     @Column(columnDefinition = "TEXT")
     private String specifications;
+    private Integer tableId;
 }

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RestaurantReservationService {
@@ -25,28 +26,24 @@ public class RestaurantReservationService {
     @Autowired
     private RestaurantReservationRepository reservationRestaurantRepository;
 
+    public Optional<Object[]> getFirstAvailableTable( Integer nrPeople, Integer hallId, LocalDate date, LocalTime arrivingTime, LocalTime leavingTime) {
+        LocalTime arrivingTime1 = arrivingTime.plusMinutes(1);
+        LocalTime leavingTime1 = leavingTime.minusMinutes(1);
+        List<Object[]> availableTables = hallTableRepository.findAvailableTables(nrPeople, hallId, date, arrivingTime1, leavingTime1);
+        return availableTables.stream().findFirst();
+    }
+
     @Transactional
-    public RestaurantReservation reserveTable(Integer nrPeople, String hallName, LocalDate date,
-                                              LocalTime arrivalTime, LocalTime leavingTime,
-                                              String nameSurname, String email, String phone, String specifications) {
-        // 1. Se obtin mesele disponibile
-        List<Object[]> availableTables = hallTableRepository.findAvailableTables(nrPeople, hallName,
-                date, arrivalTime, leavingTime);
+    public RestaurantReservation reserveTable(Integer nrPeople, Integer hallId, LocalDate date,
+                                              LocalTime arrivingTime, LocalTime leavingTime,
+                                              String nameSurname, String email, String phone, String specifications,
+                                              Integer tableId) {
 
-        if (availableTables.isEmpty()) {
-            throw new RuntimeException("Il n'y a pas des tables disponibiles dans la salle " + hallName + " à cette heure.");
-        }
-
-        // extragere prima masa disponibila si se asigneaza clientului
-        Object[] table = availableTables.get(0);
-        String hallNameResult = (String) table[0];  // Numele salii
-        Integer tableId = (Integer) table[1];//id-ul mesei
-
-        Hall hall = hallRepository.findByHallName(hallNameResult)
+        Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new RuntimeException("Erreur"));
 
         //ocupare masa disponibila in intervalul dorit de utilizator
-        hallTableRepository.addIndisponibility(tableId, date, arrivalTime, leavingTime);
+        hallTableRepository.addIndisponibility(tableId, date, arrivingTime, leavingTime);
 
         RestaurantReservation reservation = new RestaurantReservation();
         reservation.setHall(hall);
@@ -54,11 +51,43 @@ public class RestaurantReservationService {
         reservation.setEmail(email);
         reservation.setPhone(phone);
         reservation.setDate(date);
-        reservation.setArrivalTime(arrivalTime);
+        reservation.setArrivingTime(arrivingTime);
         reservation.setLeavingTime(leavingTime);
         reservation.setNrPeople(nrPeople);
         reservation.setSpecifications(specifications);
+        reservation.setTableId(tableId);
         return reservationRestaurantRepository.save(reservation);
+    }
+    public void createReservation(RestaurantReservation reservation) {
+        reservationRestaurantRepository.save(reservation);
+    }
+
+    // Obținerea tuturor rezervărilor
+    public List<RestaurantReservation> getAllReservations() {
+        return reservationRestaurantRepository.findAll();
+    }
+
+    // Obținerea unei rezervări după ID
+//    public RestaurantReservation getReservationById(Integer id) {
+//        return reservationRestaurantRepository.findById(id);
+//    }
+
+    // Ștergerea unei rezervări
+    public void deleteReservation(Integer id) {
+        Optional<RestaurantReservation> restaurantReservation = reservationRestaurantRepository.findById(id);
+        hallTableRepository.deleteIndisponibility(restaurantReservation.get().getTableId(), restaurantReservation.get().getDate(), restaurantReservation.get().getArrivingTime(), restaurantReservation.get().getLeavingTime());
+        reservationRestaurantRepository.deleteById(id);
+    }
+    public List<RestaurantReservation> getReservationsByDate(LocalDate date) {
+        System.out.println("Filtrare rezervări pentru data: " + date);
+        if (date != null) {
+            return reservationRestaurantRepository.findByDate(date);
+        }
+        return reservationRestaurantRepository.findAll(); // Dacă nu se dă nicio dată, returnează toate rezervările
+    }
+    public List<RestaurantReservation> getReservationsByHall(Integer hallId) {
+        System.out.println("Filtrare rezervări pentru sala: " + hallId);
+        return reservationRestaurantRepository.findByHallId(hallId);
     }
 }
 

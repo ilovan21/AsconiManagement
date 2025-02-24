@@ -1,5 +1,8 @@
 package com.example.asconi_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +29,10 @@ public class TouristicService {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ServiceType type;
-
+    @JsonIgnore
     @OneToMany(mappedBy = "touristicService")
     private List<ServiceHours> serviceHours;
+    @OneToMany(mappedBy = "touristicService", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<ServiceReservation> reservations;
 }

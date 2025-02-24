@@ -1,4 +1,7 @@
 package com.example.asconi_backend.model;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,9 +24,10 @@ public class ServiceReservation {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "service_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "service_id", nullable = false, referencedColumnName = "id")
+    //@JsonIgnore
+    //@JsonBackReference
     private TouristicService touristicService;
-
     @Column(name = "nom_prenom", nullable = false)
     private String nameSurname;
     private String email;
@@ -37,4 +41,5 @@ public class ServiceReservation {
     private Integer nrPeople;
     @Column(columnDefinition = "TEXT")
     private String specifications;
+
 }

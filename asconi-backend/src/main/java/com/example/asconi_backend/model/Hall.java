@@ -1,5 +1,6 @@
 package com.example.asconi_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public class Hall {
     @Column(name="statut_salle")
     private String hallStatus ="Ouvre";
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "restaurant_id", referencedColumnName = "id", insertable = false, updatable = false)
     private Restaurant restaurant;
 }

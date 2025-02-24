@@ -1,5 +1,7 @@
 package com.example.asconi_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +20,7 @@ public class ServiceHours {
     private Integer id;
 
     @ManyToOne
+    @JsonManagedReference
     @JoinColumn(name = "service_id", referencedColumnName = "id", insertable = false, updatable = false)
     private TouristicService touristicService;
 
